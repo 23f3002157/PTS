@@ -85,3 +85,60 @@
 +----------------------------------------------+-----------------------------------------------+------------+------------------------------------------------------------------+--------------+
 
 ```
+
+
+select moduleName, moduleCategory, scoreValue, moduleResult from modules where moduleName like '%CSRF%';
+
+```
++------------+----------------+------------+------------------------------------------------------------------+
+| moduleName | moduleCategory | scoreValue | moduleResult                                                     |
++------------+----------------+------------+------------------------------------------------------------------+
+| CSRF 6     | CSRF           |         90 | df611f54325786d42e6deae8bbd0b9d21cf2c9282ec6de4e04166abe2792ac00 |
+| CSRF 5     | CSRF           |         80 | 8f34078ef3e53f619618d9def1ede8a6a9117c77c2fad22f76bba633da83e6d4 |
+| CSRF 1     | CSRF           |         55 | 7639c952a191d569a0c741843b599604c37e33f9f5d8eb07abf0254635320b07 |
+| CSRF 3     | CSRF           |         70 | 6bdbe1901cbe2e2749f347efb9ec2be820cc9396db236970e384604d2d55b62a |
+| CSRF 7     | CSRF           |        120 | 849e1efbb0c1e870d17d32a3e1b18a8836514619146521fbec6623fce67b73e8 |
+| CSRF 2     | CSRF           |         70 | 45309dbaf8eaf6d1a5f1ecb1bf1b6be368a6542d3da35b9bf0224b88408dc001 |
+| CSRF 4     | CSRF           |         70 | bb78f73c7efefec25e518c3a91d50d789b689c4515b453b6140a2e4e1823d203 |
+| CSRF JSON  | CSRF           |         70 | f57f1377bd847a370d42e1410bfe48c9a3484e78d50e83f851b634fe77d41a6e |
++------------+----------------+------------+------------------------------------------------------------------+
+
+```
+
+select moduleName, moduleCategory, scoreValue, moduleResult from modules where moduleName like '%SQL%';
+
+```
++--------------------------------+----------------+------------+------------------------------------------------------------------+
+| moduleName                     | moduleCategory | scoreValue | moduleResult                                                     |
++--------------------------------+----------------+------------+------------------------------------------------------------------+
+| SQL Injection                  | Injection      |         30 | 3c17f6bf34080979e0cebda5672e989c07ceec9fa4ee7b7c17c9e3ce26bc63e0 |
+| SQL Injection 1                | Injection      |         35 | fd8e9a29dab791197115b58061b215594211e72c1680f1eacc50b0394133a09f |
+| SQL Injection 3                | Injection      |         70 | 9815 1547 3214 7569                                              |
+| SQL Injection 7                | Injection      |        110 | 4637cae3d9b961fdff880d6d5ce4f69e91fe23db0aae7dcd4038e20ed8a287dc |
+| SQL Injection 5                | Injection      |         90 | 343f2e424d5d7a2eff7f9ee5a5a72fd97d5a19ef7bff3ef2953e033ea32dd7ee |
+| SQL Injection 6                | Injection      |         95 | 17f999a8b3fbfde54124d6e94b256a264652e5087b14622e1644c884f8a33f82 |
+| SQL Injection Escaping         | Injection      |         50 | 0dcf9078ba5d878f9e23809ac8f013d1a08fdc8f12c5036f1a4746dbe86c0aac |
+| NoSQL Injection One            | Injection      |         45 | c09f32d4c3dd5b75f04108e5ffc9226cd8840288a62bdaf9dc65828ab6eaf86a |
+| SQL Injection Stored Procedure | Injection      |         90 | d9c5757c1c086d02d491cbe46a941ecde5a65d523de36ac1bfed8dd4dd9994c8 |
+| SQL Injection 4                | Injection      |         75 | d316e80045d50bdf8ed49d48f130b4acf4a878c82faef34daff8eb1b98763b6f |
+| SQL Injection 2                | Injection      |         45 | f62abebf5658a6a44c5c9babc7865110c62f5ecd9d0a7052db48c4dbee0200e3 |
++--------------------------------+----------------+------------+------------------------------------------------------------------+
+```
+
+
+select moduleName, moduleCategory, scoreValue, moduleResult from modules where moduleCategory like '%XSS%';
+
+```
++------------------------+----------------+------------+-----------------------------------------------------+
+| moduleName             | moduleCategory | scoreValue | moduleResult                                        |
++------------------------+----------------+------------+-----------------------------------------------------+
+| Cross Site Scripting 4 | XSS            |         75 | 515e05137e023dd7828adc03f639c8b13752fbdffab2353ccec |
+| Cross Site Scripting 3 | XSS            |         65 | 6abaf491c9122db375533c04df                          |
+| Cross Site Scripting 6 | XSS            |         95 | c13e42171dbd41a7020852ffdd3399b63a87f5              |
+| Cross Site Scripting   | XSS            |         15 | ea7b563b2935d8587539d747d                           |
+| Cross Site Scripting 1 | XSS            |         20 | 445d0db4a8fc5d4acb164d022b                          |
+| Cross Site Scripting 2 | XSS            |         60 | 495ab8cc7fe9532c6a75d378de                          |
+| Cross Site Scripting 5 | XSS            |         85 | 7d7cc278c30cca985ab027e9f9e09e2f759e5a3d1f63293     |
++------------------------+----------------+------------+-----------------------------------------------------+
+
+```
