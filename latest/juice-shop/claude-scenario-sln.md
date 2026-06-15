@@ -218,13 +218,13 @@ done
 
 ## 12. CSRF
 
-**Finding ID:** JS-12** 
-****Target:** `POST /profile` (user name change endpoint)** 
-****Title:** Cross-Site Request Forgery — Profile Name Change** 
-**
-**Vulnerability Type:** CSRF** ****Brief:** The name-change endpoint lacks CSRF token validation, allowing a malicious page on another origin to silently submit a forged request on behalf of an authenticated user.** **
+**Finding ID:** JS-12**
+****Target:** `POST /profile` (user name change endpoint)**
+****Title:** Cross-Site Request Forgery — Profile Name Change**
 
-**Payload:** HTML page hosted on attacker origin:
+****Vulnerability Type:** CSRF** ****Brief:** The name-change endpoint lacks CSRF token validation, allowing a malicious page on another origin to silently submit a forged request on behalf of an authenticated user.** **
+
+**Payload:** HTML page hosted on attacker origin: also toggle shield in the search bar, change the cookie settings to lax in about:config
 
 ```html
 <form action="http://<juiceshop>/profile" method="POST">
